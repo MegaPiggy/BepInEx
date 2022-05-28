@@ -109,6 +109,8 @@ namespace BepInEx.Bootstrap
 				Paths.SetExecutablePath(gameExePath);
 			}
 
+			Logger.Listeners.Add(new OWMM.LogListener());
+
 			// Start logging
 			if (ConsoleManager.ConsoleEnabled && startConsole)
 			{
