@@ -146,6 +146,8 @@ Task("MakeDist")
         CreateDirectory(bepinDir + Directory("core"));
         CreateDirectory(bepinDir + Directory("plugins"));
         CreateDirectory(bepinDir + Directory("patchers"));
+        CreateDirectory(bepinDir + Directory("config"));
+        CopyFiles($"./BepInEx.cfg", bepinDir + Directory("config"));
 
         CopyFiles($"./doorstop/{doorstopConfigPattern}", distArchDir);
         if(ensureLf)
