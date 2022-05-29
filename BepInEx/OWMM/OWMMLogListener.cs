@@ -11,16 +11,13 @@ namespace BepInEx.OWMM
 
 		public void Initialize()
 		{
-			Logger.LogInfo("Initializing OWMM Log Listener");
 			int consolePort = 0;
 			string[] args = System.Environment.GetCommandLineArgs();
 			for (int i = 0; i < args.Length; i++)
 			{
 				if (args[i] == "-consolePort") int.TryParse(args[i + 1], out consolePort);
 			}
-			Logger.LogInfo("Console Port: " + consolePort);
 			if (consolePort != 0) socket = new ModSocket(consolePort);
-			Logger.LogInfo("Initialized OWMM Log Listener");
 		}
 
 		public bool lastError = false;
