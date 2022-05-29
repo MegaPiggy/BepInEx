@@ -119,7 +119,7 @@ namespace BepInEx.Bootstrap
 						continue;
 					}
 
-					if (cache != null && cache.TryGetValue(dll, out var cacheEntry))
+					if (cache != null && cache.TryGetValue(dll, out var cacheEntry) && cacheEntry.CacheItems.Count != 0)
 					{
 						long lastWrite = File.GetLastWriteTimeUtc(dll).Ticks;
 						if (lastWrite == cacheEntry.Timestamp)
