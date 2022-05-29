@@ -30,6 +30,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarmonyXInterop", "submodul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarmonyX2Interop", "submodules\BepInEx.Harmony\HarmonyX2Interop\HarmonyX2Interop.csproj", "{69F6541D-A0F5-419D-B0EE-F5017F1D34F3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C5E50CA-7FEC-4EF1-BFDE-A05796F54938}"
+	ProjectSection(SolutionItems) = preProject
+		BepInEx.cfg = BepInEx.cfg
+		BepInEx.Manifest.json = BepInEx.Manifest.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
