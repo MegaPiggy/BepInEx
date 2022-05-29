@@ -100,7 +100,7 @@ namespace BepInEx.Bootstrap
         /// <param name="assemblyFilter">A filter function to quickly determine if the assembly can be loaded.</param>
         /// <param name="cacheName">The name of the cache to get cached types from.</param>
 		/// <returns>A dictionary of all assemblies in the directory and the list of type metadatas of types that match the selector.</returns>
-        public static Dictionary<string, List<T>> FindPluginTypes<T>(string directory, Func<TypeDefinition, T> typeSelector, Func<AssemblyDefinition, bool> assemblyFilter = null, string cacheName = null) where T : ICacheable, new()
+        public static Dictionary<string, List<T>> FindPluginTypes<T>(string directory, Func<TypeDefinition, T> typeSelector, Func<AssemblyDefinition, bool> assemblyFilter = null, string cacheName = null, Func<string, string, bool> enabledFilter = null) where T : ICacheable, new()
 		{
 			var result = new Dictionary<string, List<T>>();
 			Dictionary<string, CachedAssembly<T>> cache = null;
@@ -108,9 +108,17 @@ namespace BepInEx.Bootstrap
 			if (cacheName != null)
 				cache = LoadAssemblyCache<T>(cacheName);
 
-			foreach (string dll in Directory.GetFiles(Path.GetFullPath(directory), "*.dll", SearchOption.AllDirectories))
+			string fullPath = Path.GetFullPath(directory);
+
+			foreach (string dll in Directory.GetFiles(fullPath, "*.dll", SearchOption.AllDirectories))
 				try
 				{
+					if (!enabledFilter?.Invoke(fullPath, dll) ?? false)
+					{
+						result[dll] = new List<T>();
+						continue;
+					}
+
 					if (cache != null && cache.TryGetValue(dll, out var cacheEntry))
 					{
 						long lastWrite = File.GetLastWriteTimeUtc(dll).Ticks;

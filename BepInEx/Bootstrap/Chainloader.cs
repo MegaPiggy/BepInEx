@@ -259,6 +259,30 @@ namespace BepInEx.Bootstrap
 			return true;
 		}
 
+		private static bool IsPluginEnabled(string pluginsPath, string fullDllPath)
+        {
+			string relativeDllPath = fullDllPath.Replace(pluginsPath + "\\", "");
+			string dllName = Path.GetFileNameWithoutExtension(relativeDllPath);
+			string pluginUniqueName = Path.GetDirectoryName(relativeDllPath);
+			string configPath = Path.Combine(Path.Combine(pluginsPath, pluginUniqueName), "config.json");
+			if (File.Exists(configPath))
+			{
+				try
+				{
+					OWMM.Config config = Json.Deserialize<OWMM.Config>(File.ReadAllText(configPath));
+					Logger.LogDebug(pluginUniqueName + " is " + (config.enabled ? "enabled" : "disabled"));
+					return config.enabled;
+				}
+                catch (Exception ex)
+				{
+					Logger.LogError(ex);
+					return true;
+				}
+            }
+			else
+				return true;
+		}
+
 		private static bool PluginTargetsWrongBepin(PluginInfo pluginInfo)
 		{
 			var pluginTarget = pluginInfo.TargettedBepInExVersion;
@@ -301,7 +325,7 @@ namespace BepInEx.Bootstrap
 
 				UnityEngine.Object.DontDestroyOnLoad(ManagerObject);
 
-				var pluginsToLoad = TypeLoader.FindPluginTypes(Paths.PluginPath, ToPluginInfo, HasBepinPlugins, "chainloader");
+				var pluginsToLoad = TypeLoader.FindPluginTypes(Paths.PluginPath, ToPluginInfo, HasBepinPlugins, "chainloader", IsPluginEnabled);
 				foreach (var keyValuePair in pluginsToLoad)
 					foreach (var pluginInfo in keyValuePair.Value)
 						pluginInfo.Location = keyValuePair.Key;

@@ -115,6 +115,7 @@
     <Compile Include="Logging\ConsoleLogListener.cs" />
     <Compile Include="Logging\UnityLogListener.cs" />
     <Compile Include="Logging\UnityLogSource.cs" />
+    <Compile Include="OWMM\Config.cs" />
     <Compile Include="OWMM\MessageType.cs" />
     <Compile Include="OWMM\ModSocket.cs" />
     <Compile Include="OWMM\ModSocketMessage.cs" />
