@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace BepInEx.Logging
 {
@@ -18,7 +19,8 @@ namespace BepInEx.Logging
 		/// </summary>
 		public static ICollection<ILogSource> Sources { get; } = new LogSourceCollection();
 
-		private static readonly ManualLogSource InternalLogSource = CreateLogSource("BepInEx");
+
+		private static readonly StaticLogSource InternalLogSource = new StaticLogSource("BepInEx");
 
 		private static bool internalLogsInitialized;
 
@@ -40,22 +42,53 @@ namespace BepInEx.Logging
 			}
 		}
 
+		internal static void Log(LogLevel level, object data, Assembly calling)
+		{
+			InternalLogSource.Log(level, data, calling.GetName().Name);
+		}
+
 		/// <summary>
 		/// Logs an entry to the current logger instance.
 		/// </summary>
 		/// <param name="level">The level of the entry.</param>
 		/// <param name="data">The textual value of the entry.</param>
-		internal static void Log(LogLevel level, object data)
-		{
-			InternalLogSource.Log(level, data);
-		}
+		public static void Log(LogLevel level, object data) => Log(level, data, Assembly.GetCallingAssembly());
 
-		internal static void LogFatal(object data) => Log(LogLevel.Fatal, data);
-		internal static void LogError(object data) => Log(LogLevel.Error, data);
-		internal static void LogWarning(object data) => Log(LogLevel.Warning, data);
-		internal static void LogMessage(object data) => Log(LogLevel.Message, data);
-		internal static void LogInfo(object data) => Log(LogLevel.Info, data);
-		internal static void LogDebug(object data) => Log(LogLevel.Debug, data);
+		/// <summary>
+		/// Logs a message with <see cref="LogLevel.Fatal"/> level.
+		/// </summary>
+		/// <param name="data">Data to log.</param>
+		public static void LogFatal(object data) => Log(LogLevel.Fatal, data, Assembly.GetCallingAssembly());
+
+		/// <summary>
+		/// Logs a message with <see cref="LogLevel.Error"/> level.
+		/// </summary>
+		/// <param name="data">Data to log.</param>
+		public static void LogError(object data) => Log(LogLevel.Error, data, Assembly.GetCallingAssembly());
+
+		/// <summary>
+		/// Logs a message with <see cref="LogLevel.Warning"/> level.
+		/// </summary>
+		/// <param name="data">Data to log.</param>
+		public static void LogWarning(object data) => Log(LogLevel.Warning, data, Assembly.GetCallingAssembly());
+
+		/// <summary>
+		/// Logs a message with <see cref="LogLevel.Message"/> level.
+		/// </summary>
+		/// <param name="data">Data to log.</param>
+		public static void LogMessage(object data) => Log(LogLevel.Message, data, Assembly.GetCallingAssembly());
+
+		/// <summary>
+		/// Logs a message with <see cref="LogLevel.Info"/> level.
+		/// </summary>
+		/// <param name="data">Data to log.</param>
+		public static void LogInfo(object data) => Log(LogLevel.Info, data, Assembly.GetCallingAssembly());
+
+		/// <summary>
+		/// Logs a message with <see cref="LogLevel.Debug"/> level.
+		/// </summary>
+		/// <param name="data">Data to log.</param>
+		public static void LogDebug(object data) => Log(LogLevel.Debug, data, Assembly.GetCallingAssembly());
 
 		/// <summary>
 		/// Creates a new log source with a name and attaches it to log sources.
@@ -106,6 +139,37 @@ namespace BepInEx.Logging
 
 				return true;
 			}
+		}
+
+		private class StaticLogSource : ILogSource
+		{
+			/// <inheritdoc />
+			public string SourceName => !string.IsNullOrEmpty(currentSourceName) ? currentSourceName : originalSourceName;
+
+			private string originalSourceName = string.Empty;
+			private string currentSourceName = string.Empty;
+
+			/// <inheritdoc />
+			public event EventHandler<LogEventArgs> LogEvent;
+
+			/// <summary>
+			/// Creates a manual log source.
+			/// </summary>
+			/// <param name="sourceName">Name of the log source.</param>
+			public StaticLogSource(string sourceName)
+			{
+				originalSourceName = sourceName;
+				Sources.Add(this);
+			}
+
+			internal void Log(LogLevel level, object data, string source)
+			{
+				currentSourceName = source;
+				LogEvent?.Invoke(this, new LogEventArgs(data, level, this));
+			}
+
+			/// <inheritdoc />
+			public void Dispose() { }
 		}
 	}
 }
