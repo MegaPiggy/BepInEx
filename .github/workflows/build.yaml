@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches: [ v5-lts ]
+  pull_request:
+  workflow_dispatch:
+  
+env:
+  GH_ACTIONS: 'true'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo files
+        uses: actions/checkout@v2
+
+      - name: Read checked out manifest.json
+        id: read_manifest
+        uses: MegaPiggy/json-reader-action@v1.0.0
+        with:
+          path: "BepInEx.Manifest.json"
+          property: "version"
+          
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Build using Cake
+        run: dotnet cake build.cake --target=Pack
+
+      - name: Upload x86 Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: BepInEx_x86_${{steps.read_manifest.outputs.version}}.0
+          path: bin\dist\x86
+
+      - name: Upload x64 Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: BepInEx_x64_${{steps.read_manifest.outputs.version}}.0
+          path: bin\dist\x64
+
+      - name: Upload Unix Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: BepInEx_unix_${{steps.read_manifest.outputs.version}}.0
+          path: bin\dist\nix
