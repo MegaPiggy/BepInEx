@@ -1,6 +1,4 @@
-<p align="center">
-    <img src="https://avatars2.githubusercontent.com/u/39589027?s=256">
-</p>
+![BepInEx](https://user-images.githubusercontent.com/34462599/212477590-090325df-4fd0-461b-9d85-737a63bb28e4.png)
 
 # BepInEx
 ![Github All Releases](https://img.shields.io/github/downloads/bepinex/bepinex/total.svg)
